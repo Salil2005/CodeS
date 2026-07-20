@@ -11,13 +11,14 @@ import chatRoutes from "./routes/chatRoutes.js"
 const app = express();
 
 //middleware 
+app.use(clerkMiddleware()); // add Clerk middleware to handle authentication and user management
 app.use(express.json()) ;
 app.use(cors({ origin: ENV.CLIENT_URL, credentials: true })); // TRUE : allow cookies to be sent with requests from the client
-app.use(clerkMiddleware()); // add Clerk middleware to handle authentication and user management
+
 
 
 app.use("/api/inngest", serve({ client: inngest , functions}))
-app.use("api/chat" , chatRoutes) ;
+app.use("/api/chat" , chatRoutes) ;
 
 app.get("/video-call", protectRoute , (req, res) => {
   res.status(200).json({ message: "this video call endpoint" });
