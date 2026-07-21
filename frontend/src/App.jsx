@@ -1,5 +1,3 @@
-import "./App.css";
-
 import {
   SignedIn,
   SignedOut,
@@ -7,20 +5,23 @@ import {
   SignOutButton,
   UserButton,
 } from "@clerk/clerk-react";
+import { Navigate, Route, Routes } from "react-router";
+import Home from "./pages/Home";
+
+import Problem from "./pages/Problem";
+import { Toaster } from "react-hot-toast";
 
 function App() {
+  const {isSignedIn} = useUser() ; // User already loged in or not
   return (
     <>
-      <h1>Welcome to the application</h1>
+      <Routes>
 
-      <SignedOut>
-        <SignInButton mode="modal" />
-      </SignedOut>
+      <Route path="/" element={<Home />} />
 
-      <SignedIn>
-        <UserButton />
-        <SignOutButton />
-      </SignedIn>
+      <Route path="/problems" element={isSignedIn ? <Problem /> : <Navigate to={"/"}/>} />
+      </Routes>
+      <Toaster toastOptions={{duration : 3000}}/>
     </>
   );
 }
