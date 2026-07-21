@@ -107,13 +107,11 @@ export async function joinSession(req, res) {
     const userId = req.user._id;
     const clerkId = req.user.clerkId;
 
-    const session = await session.findById(id);
+    const session = await Session.findById(id);
 
     if (!session) {
-      return res.ststus(404).json({ message: "session not found" });
-    }
-
-    if (session.status !== "active") {
+      return res.status(404).json({ message: "session not found" });
+    }    if (session.status !== "Active") {
       return res
         .status(400)
         .json({ message: "Cannot join a completed session" });
@@ -127,9 +125,8 @@ export async function joinSession(req, res) {
 
     // check session is already full
     if (session.participant) {
-      return res.ststus(409).json({ message: "session is full" });
+      return res.status(409).json({ message: "session is full" });
     }
-
     const channel = chatClient.channel("messaging", session.callId);
     await channel.addMembers([clerkId]);
     res.status(200).json({ session });
@@ -143,34 +140,32 @@ export async function endSession(req, res) {
     const { id } = req.params;
     const userId = req.user._id;
 
-    const session = await session.findById(id);
+    const session = await Session.findById(id);
 
     if (!session) {
-      return res.ststus(404).json({ message: "session not found" });
-    }
+      return res.status(404).json({ message: "session not found" });    }
 
     if (session.host.toString() !== userId.toString()) {
       return res.status(403).json({ message: "Only host can end the session" });
     }
-    if (session.host.toString() !== userId.toString()) {
-      return res.status(403).json({ message: "Only host can end the session" });
-    }
+
     if (session.status == "Completed") {
       return res.status(400).json({ message: "Session is already completed" });
     }
 
-    // delete chat and video call
+    session.status = "Completed";
+    await session.save();
+
+    // delete chat and video call after status is persisted
+
     const call = streamClient.video.call("default", session.callId);
     await call.delete({ hard: true });
 
     const chat = chatClient.channel("messaging", session.callId);
     await chat.delete();
 
-    session.status = "Completed";
-    await session.save();
-
     res.status(200).json({ message: "Session ended successfully" });
-  } catch (error) {
+  } catch(error) {
     console.log("Error in ending session", error.message);
     res.status(500).json({ message: "Internal server issues" });
   }

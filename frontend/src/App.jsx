@@ -12,14 +12,21 @@ import Problem from "./pages/Problem";
 import { Toaster } from "react-hot-toast";
 
 function App() {
-  const {isSignedIn} = useUser() ; // User already loged in or not
+  const { isLoaded, isSignedIn } = useUser();
+
   return (
     <>
       <Routes>
 
       <Route path="/" element={<Home />} />
 
-      <Route path="/problems" element={isSignedIn ? <Problem /> : <Navigate to={"/"}/>} />
+      <Route
+        path="/problems"
+        element={
+          !isLoaded ? <div>Loading...</div> :
+          isSignedIn ? <Problem /> : <Navigate to="/" replace />
+        }
+      />
       </Routes>
       <Toaster toastOptions={{duration : 3000}}/>
     </>
