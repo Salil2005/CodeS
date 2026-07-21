@@ -1,8 +1,8 @@
-import { streamClient } from '../lib/stream.js';        
+import { chatClient } from '../lib/stream.js';        
 
 export async function getStreamToken(req,res) {
     try {
-        const token = streamClient.createToken(req.user.clerkId) // clerkid for stream because in stream we get id from clerk
+        const token = chatClient.createToken(req.user.clerkId) // clerkid for stream because in stream we get id from clerk
         res.status(200).json({
             token,
             userId : req.user.clerkId ,

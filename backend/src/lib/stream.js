@@ -1,19 +1,21 @@
 import {StreamChat} from 'stream-chat';
+import { StreamClient } from "@stream-io/node-sdk";
 import {ENV} from './env.js'; 
 
 const apiKey = ENV.STREAM_API_KEY;
 const apiSecret = ENV.STREAM_API_SECRET;
 
 if(!apiKey || !apiSecret){
-    console.log("STREAM_API_KEY or STREAM_API_SECRET is missing in the environment variables");
+    throw new Error("STREAM_API_KEY and STREAM_API_SECRET are required");
 }
 
-export const streamClient = StreamChat.getInstance(apiKey, apiSecret);
+export const chatClient = StreamChat.getInstance(apiKey, apiSecret);
+export const streamClient = new StreamClient(apiKey, apiSecret);
 
 
 export const upsertStreamUser = async(userData) => {
     try{
-        await streamClient.upsertUser(userData);
+        await chatClient.upsertUser(userData);
         console.log("Stream user upserted successfully :" , userData);
         
     } catch (error) {
@@ -25,7 +27,7 @@ export const upsertStreamUser = async(userData) => {
 
 export const deleteStreamUser = async(userData) => {
     try{
-        await streamClient.deleteUser(userData.id);
+        await chatClient.deleteUser(userData.id);
         console.log("User deleted successfully " , userData.id);
         
     } catch (error) {
