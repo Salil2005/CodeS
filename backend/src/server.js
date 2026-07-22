@@ -21,6 +21,7 @@ app.use(cors({ origin: ENV.CLIENT_URL, credentials: true })); // TRUE : allow co
 app.use("/api/inngest" , serve({client: inngest , functions}));
 app.use("/api/chat", chatRoutes);
 app.use("/api/sessions", sessionRoutes);
+app.use("/api/execute", (await import("./routes/executeRoute.js")).default);
 
 app.get("/video-call", protectRoute , (req, res) => {
   res.status(200).json({ message: "this video call endpoint" });
